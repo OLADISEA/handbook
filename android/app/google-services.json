@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "83681672893",
+    "firebase_url": "https://ui-chatbot-24246-default-rtdb.firebaseio.com",
+    "project_id": "ui-chatbot-24246",
+    "storage_bucket": "ui-chatbot-24246.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:83681672893:android:06881f4d7f25e0b64781d4",
+        "android_client_info": {
+          "package_name": "com.Oladisea.ui_chatbot"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxYpBCtokHkXbfGUId4UMVcr6vDUg9uS4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
