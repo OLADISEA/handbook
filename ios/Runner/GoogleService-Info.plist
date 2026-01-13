@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyApB6K0_3sURVK3JS7wRCfjRQ5cW0s_e_0</string>
+	<string>AIzaSyAJs50X4mf46vkqOL4crsJcsH3bxyStegM</string>
 	<key>GCM_SENDER_ID</key>
-	<string>83681672893</string>
+	<string>24912160756</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.Oladisea.uiChatbot</string>
 	<key>PROJECT_ID</key>
-	<string>ui-chatbot-24246</string>
+	<string>handy-bot-58fc8</string>
 	<key>STORAGE_BUCKET</key>
-	<string>ui-chatbot-24246.appspot.com</string>
+	<string>handy-bot-58fc8.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,8 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:83681672893:ios:cba944956bad82f24781d4</string>
-	<key>DATABASE_URL</key>
-	<string>https://ui-chatbot-24246-default-rtdb.firebaseio.com</string>
+	<string>1:24912160756:ios:15283f5c4376d176697ba1</string>
 </dict>
 </plist>

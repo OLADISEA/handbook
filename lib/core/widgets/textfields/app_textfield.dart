@@ -8,8 +8,10 @@ import '../texts/app_text.dart';
 class AppTextField extends StatelessWidget {
   final String label;
   final bool isMandatory;
+  final bool obscureText;
   final String hintText;
   final Widget? suffixIcon;
+  final Widget? prefixIcon;
   final String? errorText;
   final TextEditingController? controller;
   final TextInputType keyboardType;
@@ -24,9 +26,11 @@ class AppTextField extends StatelessWidget {
   const AppTextField({
     super.key,
     required this.label,
+    this.obscureText = false,
     this.isMandatory = false,
     required this.hintText,
     this.suffixIcon,
+    this.prefixIcon,
     this.errorText,
     this.controller,
     this.keyboardType = TextInputType.text,
@@ -74,6 +78,7 @@ class AppTextField extends StatelessWidget {
 
         TextFormField(
           style: TextStyle(fontSize: 16.sp),
+          obscureText: obscureText,
           controller: controller,
           initialValue: initialValue,
           keyboardType: keyboardType,
@@ -114,7 +119,7 @@ class AppTextField extends StatelessWidget {
                       ),
                     ),
                   )
-                : null,
+                : prefixIcon,
             prefixIconConstraints: BoxConstraints(minWidth: 40.w),
             focusedBorder:OutlineInputBorder(
               borderSide: const BorderSide(color: AppColors.primaryColor),
