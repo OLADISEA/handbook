@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ui_chatbot/config/app_colors.dart';
-import 'package:ui_chatbot/core/widgets/buttons/primary_button.dart';
-import 'package:ui_chatbot/widget/my_button.dart';
 import '../../core/constants/app_colors.dart';
 import '../../services/auth/login_or_register.dart';
-import '../../widget/reusable_text.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -14,249 +12,190 @@ class OnboardingPage extends StatefulWidget {
   State<OnboardingPage> createState() => _OnboardingPageState();
 }
 
-class _OnboardingPageState extends State<OnboardingPage> {
+class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStateMixin {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  bool checkBox = false;
+  // Data tailored for your UI CS Handbook Project
+  final List<Map<String, String>> onboardingData = [
+    {
+      "title": "Welcome to HandiBot",
+      "description": "Your AI-powered assistant for the UI Computer Science Handbook. Instant answers, anytime.",
+      "image": "assets/images/chatbot-image.png",
+    },
+    {
+      "title": "Smart Search",
+      "description": "No more flipping through 50 pages. Ask about prerequisites, rules, and departmental policies.",
+      "image": "assets/images/chatbot-image.png",
+    },
+    {
+      "title": "Precision Calculator",
+      "description": "Compute your academic standing accurately with our built-in grade tool.",
+      "image": "assets/images/chatbot-image.png",
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.white,
-      body: Container(
-        padding: EdgeInsets.only(top: 50.h),
-        child: Column(
-          children: [
-            // PageView to scroll between different onboarding screens
-            Expanded(
-              child: PageView(
-                controller: _pageController,
-                onPageChanged: (int page) {
-                  setState(() {
-                    _currentPage = page;
-                  });
-                },
-                children: [
-                  buildOnboardingPage(
-                    imagePath: "assets/images/chatbot-image.png",
-                    title: "Welcome to UI ChatBot",
-                    description:
-                    "Ask Career related Questions and choose a field of your interest.",
-                  ),
-                  buildOnboardingPage(
-                    imagePath: "assets/images/chatbot-image.png",
-                    title: "Connect Easily",
-                    description:
-                    "UI ChatBot helps you to easily connect with career advisors.",
-                  ),
-                  buildOnboardingPage(
-                    imagePath: "assets/images/chatbot-image.png",
-                    title: "Discover Opportunities",
-                    description:
-                    "Explore various career opportunities tailored to your interest.",
-                  ),
-                ],
-              ),
-            ),
-
-            // Page Indicator (dots)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(3, (index) {
-                return buildIndicator(index == _currentPage);
-              }),
-            ),
-
-            // Get Started Button
-            SizedBox(height: 20.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 30.w),
-              child: PrimaryButton(
-                text: _currentPage == 2 ? "Get Started" : "Next",
-                onPressed: () {
-                  if (_currentPage == 2) {
-                    // Navigate to AuthGate if it's the last page
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => const LoginOrRegister()),
-                    );
-                  } else {
-                    // Move to the next page
-                    _pageController.nextPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                    );
-                  }
-                },
-                textColor: Colors.white,
-                color: AppColors.primaryColor,
-                textSize: 15.sp,
-              ),
-            ),
-            SizedBox(height: 20.h),
-
-            // Checkbox for Terms and Conditions
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.center,
-            //   children: [
-            //     IconButton(
-            //       onPressed: () {
-            //         setState(() {
-            //           checkBox = !checkBox;
-            //         });
-            //       },
-            //       icon: Icon(
-            //         checkBox ? Icons.check_box : Icons.check_box_outline_blank,
-            //       ),
-            //     ),
-            //     Reusable(
-            //       text: "Accept the Terms and Conditions",
-            //       fontSize: 15.sp,
-            //     ),
-            //   ],
-            // ),
-            SizedBox(height: 30.h),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Widget to build individual onboarding page
-  Widget buildOnboardingPage({
-    required String imagePath,
-    required String title,
-    required String description,
-  }) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 30.w),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      backgroundColor: Colors.white,
+      body: Stack(
         children: [
-          Image.asset(imagePath, height: 200.h),
-          SizedBox(height: 40.h),
-          Reusable(
-            text: title,
-            fontSize: 22.sp,
-            fontWeight: FontWeight.bold,
-            textAlign: TextAlign.center,
+          // 1. Dynamic Background Blobs
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 800),
+            top: _currentPage == 0 ? -50.h : -150.h,
+            left: _currentPage == 1 ? -50.w : -100.w,
+            child: _buildBlob(300.r, AppColors.primaryColor.withOpacity(0.1)),
           ),
-          SizedBox(height: 20.h),
-          Reusable(
-            text: description,
-            fontSize: 18.sp,
-            textAlign: TextAlign.center,
+
+          SafeArea(
+            child: Column(
+              children: [
+                // 2. Skip Button
+                _buildSkipButton(),
+
+                // 3. Main Content with PageView
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pageController,
+                    onPageChanged: (index) => setState(() => _currentPage = index),
+                    itemCount: onboardingData.length,
+                    itemBuilder: (context, index) {
+                      return _buildPageContent(index);
+                    },
+                  ),
+                ),
+
+                // 4. Bottom Controls
+                _buildBottomControls(),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  // Widget for the indicator (dot)
-  Widget buildIndicator(bool isActive) {
-    return AnimatedContainer(
-      duration: Duration(milliseconds: 300),
-      height: 8.h,
-      width: isActive ? 20.w : 8.w,
-      margin: EdgeInsets.symmetric(horizontal: 5.w),
-      decoration: BoxDecoration(
-        color: isActive ? AppColors.primaryColor : Colors.grey[300],
-        borderRadius: BorderRadius.circular(12),
+  Widget _buildSkipButton() {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20.w),
+        child: Visibility(
+          visible: _currentPage != 2,
+          child: TextButton(
+            onPressed: () => _pageController.animateToPage(2,
+                duration: const Duration(milliseconds: 600), curve: Curves.easeInOut),
+            child: Text("Skip", style: TextStyle(color: Colors.grey, fontSize: 16.sp)),
+          ),
+        ),
       ),
     );
   }
+
+  Widget _buildPageContent(int index) {
+    bool isSelected = _currentPage == index;
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Scaling Image Animation
+        AnimatedScale(
+          scale: isSelected ? 1.0 : 0.7,
+          duration: const Duration(milliseconds: 500),
+          child: Image.asset(onboardingData[index]['image']!, height: 250.h),
+        ),
+        SizedBox(height: 50.h),
+        // Fading Text Animation
+        AnimatedOpacity(
+          opacity: isSelected ? 1.0 : 0.0,
+          duration: const Duration(milliseconds: 500),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 40.w),
+            child: Column(
+              children: [
+                Text(
+                  onboardingData[index]['title']!,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 26.sp, fontWeight: FontWeight.bold, color: Colors.black87),
+                ),
+                SizedBox(height: 15.h),
+                Text(
+                  onboardingData[index]['description']!,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16.sp, color: Colors.grey[600], height: 1.5),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBottomControls() {
+    return Padding(
+      padding: EdgeInsets.all(30.w),
+      child: Column(
+        children: [
+          // Custom Dot Indicators
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(onboardingData.length, (index) => _buildDot(index)),
+          ),
+          SizedBox(height: 40.h),
+          // Gradient Button
+          GestureDetector(
+            onTap: () async{
+              if (_currentPage == 2) {
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.setBool('onboarding_complete', true);
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginOrRegister()));
+              } else {
+                _pageController.nextPage(duration: const Duration(milliseconds: 400), curve: Curves.ease);
+              }
+            },
+            child: Container(
+              height: 55.h,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [AppColors.primaryColor, AppColors.primaryColor.withOpacity(0.8)]),
+                borderRadius: BorderRadius.circular(15.r),
+                boxShadow: [
+                  BoxShadow(color: AppColors.primaryColor.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 5))
+                ],
+              ),
+              child: Center(
+                child: Text(
+                  _currentPage == 2 ? "Get Started" : "Next",
+                  style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDot(int index) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      margin: const EdgeInsets.only(right: 8),
+      height: 8.h,
+      width: _currentPage == index ? 24.w : 8.w,
+      decoration: BoxDecoration(
+        color: _currentPage == index ? AppColors.primaryColor : Colors.grey[300],
+        borderRadius: BorderRadius.circular(5),
+      ),
+    );
+  }
+
+  Widget _buildBlob(double size, Color color) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+    );
+  }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import 'package:flutter/material.dart';
-// import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:ui_chatbot/config/app_colors.dart';
-// import 'package:ui_chatbot/features/auth/login_page.dart';
-// import 'package:ui_chatbot/services/auth/auth_gate.dart';
-// import 'package:ui_chatbot/widget/my_button.dart';
-//
-// import '../../widget/reusable_text.dart';
-//
-//
-// class OnboardingPage extends StatefulWidget {
-//   const OnboardingPage({super.key});
-//
-//   @override
-//   State<OnboardingPage> createState() => _OnboardingPageState();
-// }
-//
-// class _OnboardingPageState extends State<OnboardingPage> {
-//
-//   bool checkBox = false;
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Container(
-//         margin: EdgeInsets.only(left: 30.w,top: 100.h,right: 30.w),
-//         child: Column(
-//           children: [
-//             Image.asset("assets/images/chatbot-image.png"),
-//             SizedBox(height: 40.h),
-//             Container(
-//               padding: EdgeInsets.all(15.h),
-//
-//               child: Reusable(text: "Welcome to UI ChatBot",fontSize: 22.sp,),
-//             ),
-//             SizedBox(height: 40.h,),
-//             MyButton(text: "Get Started",onTap: (){
-//               Navigator.of(context).push(MaterialPageRoute(builder: (context)=> const AuthGate()));
-//
-//             }, textColor: Colors.white, buttonColor: AppColor.gradientColor1, fontSize: 15.sp,),
-//             SizedBox(height: 35.h,),
-//             Container(
-//                 padding: EdgeInsets.only(left: 15.w,right: 15.w),
-//                 height: 60.h,
-//                 child: Reusable(text: "Ask Career related Questions and choose a field of your interest",fontSize: 18.sp,textAlign: TextAlign.center,)),
-//             SizedBox(height: 10.h,),
-//             Row(
-//               //mainAxisAlignment: MainAxisAlignment.center,
-//               children: [
-//                 IconButton(onPressed: (){
-//                   setState(() {
-//                     checkBox = !checkBox;
-//                   });
-//                 }, icon: Icon(checkBox?Icons.check_box:Icons.check_box_outline_blank)),
-//                 Reusable(text: "Accept the Terms and Conditions", fontSize: 15.sp,)
-//
-//               ],
-//             ),
-//
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }

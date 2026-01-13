@@ -1,5 +1,1 @@
-{
-  "database": {
-    "rules": "database.rules.json"
-  }
-}
+{"database":{"rules":"database.rules.json"},"flutter":{"platforms":{"android":{"default":{"projectId":"handy-bot-58fc8","appId":"1:24912160756:android:ea84ccbd891e0a7b697ba1","fileOutput":"android/app/google-services.json"}},"ios":{"default":{"projectId":"handy-bot-58fc8","appId":"1:24912160756:ios:15283f5c4376d176697ba1","uploadDebugSymbols":false,"fileOutput":"ios/Runner/GoogleService-Info.plist"}},"macos":{"default":{"projectId":"handy-bot-58fc8","appId":"1:24912160756:ios:15283f5c4376d176697ba1","uploadDebugSymbols":false,"fileOutput":"macos/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"handy-bot-58fc8","configurations":{"android":"1:24912160756:android:ea84ccbd891e0a7b697ba1","ios":"1:24912160756:ios:15283f5c4376d176697ba1","macos":"1:24912160756:ios:15283f5c4376d176697ba1","web":"1:24912160756:web:56c0ba86f8f49a19697ba1","windows":"1:24912160756:web:b4eaad08d266794a697ba1"}}}}}}

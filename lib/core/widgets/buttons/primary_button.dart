@@ -13,6 +13,7 @@ class PrimaryButton extends StatelessWidget {
   final Color? color;
   final Color? borderColor;
   final double? borderRadius;
+  final Widget? icon;
 
   final Color? textColor;
 
@@ -24,6 +25,7 @@ class PrimaryButton extends StatelessWidget {
     this.height,
     this.textSize,
     this.color,
+    this.icon,
     this.borderColor,
     this.textColor,
     this.borderRadius
@@ -50,11 +52,26 @@ class PrimaryButton extends StatelessWidget {
         ),
         onPressed: onPressed,
         child: Center(
-            child: AppText(
+            child: icon == null
+                ?AppText(
               text: text,
               fontSize: textSize??16.sp,
               fontWeight: FontWeight.w600,
               color: textColor?? AppColors.white,lineHeight: 1,)
+                : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                icon!,
+                SizedBox(width: 8.w),
+                AppText(
+                  text: text,
+                  fontSize: textSize ?? 16.sp,
+                  fontWeight: FontWeight.w600,
+                  color: textColor ?? AppColors.white,
+                  lineHeight: 1,
+                ),
+              ],
+            ),
         )
 
       ),

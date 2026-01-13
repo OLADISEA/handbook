@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-
-import '../../config/app_colors.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:ui_chatbot/core/widgets/texts/app_text.dart';
+import 'package:ui_chatbot/core/widgets/buttons/primary_button.dart';
 
 class FeedbackScreen extends StatefulWidget {
   const FeedbackScreen({super.key});
@@ -14,213 +15,218 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   double _rating = 0.0;
   final TextEditingController _commentController = TextEditingController();
 
-  final _formKey = GlobalKey<FormState>();
-
-  // Survey Questions Responses
+  // Selected responses
   String? _satisfaction;
   String? _accuracy;
-  String? _easeOfUse;
   String? _recommend;
 
   @override
   Widget build(BuildContext context) {
+    const primaryColor = Color(0xFF6C63FF);
+
     return Scaffold(
-      backgroundColor: AppColor.backgroundColor,
+      backgroundColor: const Color(0xFFF8F9FE),
       appBar: AppBar(
-        title: const Text('Feedback'),
+        title: AppText(text: 'App Evaluation', fontSize: 18.sp, fontWeight: FontWeight.bold),
         centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Rate your experience:',
-                style: TextStyle(fontSize: 18),
-              ),
-              const SizedBox(height: 10),
+        padding: EdgeInsets.all(20.sp),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(),
+            SizedBox(height: 24.h),
 
-              // Rating bar to give feedback
-              RatingBar.builder(
-                initialRating: 0,
-                minRating: 1,
-                direction: Axis.horizontal,
-                allowHalfRating: true,
-                itemCount: 5,
-                itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
-                itemBuilder: (context, _) => const Icon(
-                  Icons.star,
-                  color: Colors.amber,
-                ),
-                onRatingUpdate: (rating) {
-                  setState(() {
-                    _rating = rating;
-                  });
-                },
+            _buildSectionCard(
+              title: "Overall Experience",
+              child: Column(
+                children: [
+                  AppText(text: "How would you rate the Handbook Bot?", fontSize: 14.sp),
+                  SizedBox(height: 12.h),
+                  RatingBar.builder(
+                    initialRating: 0,
+                    minRating: 1,
+                    direction: Axis.horizontal,
+                    allowHalfRating: true,
+                    itemCount: 5,
+                    itemSize: 40.sp,
+                    itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    itemBuilder: (context, _) => const Icon(Icons.star_rounded, color: Colors.amber),
+                    onRatingUpdate: (rating) => setState(() => _rating = rating),
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
+            ),
 
-              // Question 1: Satisfaction
-              const Text('How satisfied are you with the responses provided by the chatbot?'),
-              const SizedBox(height: 10),
-              _buildRadioGroup(
-                value: _satisfaction,
-                onChanged: (value) {
-                  setState(() {
-                    _satisfaction = value;
-                  });
-                },
-                options: {
-                  'Very satisfied': 'Very satisfied',
-                  'Satisfied': 'Satisfied',
-                  'Neutral': 'Neutral',
-                  'Dissatisfied': 'Dissatisfied',
-                  'Very dissatisfied': 'Very dissatisfied',
-                },
+            SizedBox(height: 16.h),
+
+            _buildSectionCard(
+              title: "Handbook Accuracy",
+              child: _buildChoiceGroup(
+                question: "Did the bot provide correct information based on the Departmental Handbook?",
+                options: ["Very Accurate", "Mostly Accurate", "Inaccurate"],
+                selected: _accuracy,
+                onSelected: (val) => setState(() => _accuracy = val),
               ),
-              const SizedBox(height: 20),
+            ),
 
-              // Question 2: Accuracy
-              const Text('Do you feel that the chatbot provided accurate information about your queries (admission/program)?'),
-              const SizedBox(height: 10),
-              _buildRadioGroup(
-                value: _accuracy,
-                onChanged: (value) {
-                  setState(() {
-                    _accuracy = value;
-                  });
-                },
-                options: {
-                  'Yes': 'Yes',
-                  'No': 'No',
-                },
+            SizedBox(height: 16.h),
+
+            _buildSectionCard(
+              title: "Utility",
+              child: _buildChoiceGroup(
+                question: "Did the bot help you understand your course requirements better?",
+                options: ["Yes, very helpful", "Somewhat", "Not at all"],
+                selected: _satisfaction,
+                onSelected: (val) => setState(() => _satisfaction = val),
               ),
-              const SizedBox(height: 20),
+            ),
 
-              // Question 3: Ease of Use
-              const Text('How easy was it to use the chatbot?'),
-              const SizedBox(height: 10),
-              _buildRadioGroup(
-                value: _easeOfUse,
-                onChanged: (value) {
-                  setState(() {
-                    _easeOfUse = value;
-                  });
-                },
-                options: {
-                  'Very easy': 'Very easy',
-                  'Easy': 'Easy',
-                  'Neutral': 'Neutral',
-                  'Difficult': 'Difficult',
-                  'Very difficult': 'Very difficult',
-                },
-              ),
-              const SizedBox(height: 20),
+            SizedBox(height: 16.h),
 
-              // Question 4: Recommendation
-              const Text('Would you recommend the chatbot to other prospective students?'),
-              const SizedBox(height: 10),
-              _buildRadioGroup(
-                value: _recommend,
-                onChanged: (value) {
-                  setState(() {
-                    _recommend = value;
-                  });
-                },
-                options: {
-                  'Yes': 'Yes',
-                  'No': 'No',
-                },
-              ),
-              const SizedBox(height: 20),
-
-              // Comment section
-              TextFormField(
+            _buildSectionCard(
+              title: "Additional Comments",
+              child: TextField(
                 controller: _commentController,
+                maxLines: 4,
                 decoration: InputDecoration(
-                  labelText: 'Additional comments or suggestions',
+                  hintText: "Tell us how we can make this bot better for CS students...",
+                  fillColor: Colors.grey.shade50,
+                  filled: true,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(12.r),
+                    borderSide: BorderSide(color: Colors.grey.shade200),
                   ),
                 ),
-                maxLines: 5,
               ),
-              const SizedBox(height: 20),
+            ),
 
-              // Submit Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _submitFeedback,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'Submit Feedback',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-              ),
-            ],
-          ),
+            SizedBox(height: 32.h),
+
+            PrimaryButton(
+              text: "Submit Evaluation",
+              onPressed: _submitFeedback,
+            ),
+            SizedBox(height: 30.h),
+          ],
         ),
       ),
     );
   }
 
-  // Reusable widget for survey questions
-  Widget _buildRadioGroup({
-    required String? value,
-    required Function(String?) onChanged,
-    required Map<String, String> options,
+  Widget _buildHeader() {
+    return Container(
+      padding: EdgeInsets.all(16.r),
+      decoration: BoxDecoration(
+        color: const Color(0xFF6C63FF).withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.analytics_outlined, color: Color(0xFF6C63FF), size: 30),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: AppText(
+              text: "Your feedback helps us evaluate the efficiency of this AI system for the Computer Science Department.",
+              fontSize: 13.sp,
+              color: Colors.black87,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionCard({required String title, required Widget child}) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(16.r),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppText(text: title, fontWeight: FontWeight.bold, fontSize: 15.sp, color: const Color(0xFF6C63FF)),
+          SizedBox(height: 12.h),
+          child,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChoiceGroup({
+    required String question,
+    required List<String> options,
+    required String? selected,
+    required Function(String) onSelected,
   }) {
     return Column(
-      children: options.entries.map((entry) {
-        return RadioListTile<String>(
-          value: entry.value,
-          groupValue: value,
-          onChanged: onChanged,
-          title: Text(entry.key),
-        );
-      }).toList(),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppText(text: question, fontSize: 13.sp, color: Colors.black54),
+        SizedBox(height: 12.h),
+        Wrap(
+          spacing: 8.w,
+          runSpacing: 8.h,
+          children: options.map((option) {
+            final isSelected = selected == option;
+            return GestureDetector(
+              onTap: () => onSelected(option),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                decoration: BoxDecoration(
+                  color: isSelected ? const Color(0xFF6C63FF) : Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(20.r),
+                ),
+                child: AppText(
+                  text: option,
+                  color: isSelected ? Colors.white : Colors.black87,
+                  fontSize: 12.sp,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 
   void _submitFeedback() {
-    if (_rating == 0.0 && _satisfaction == null && _commentController.text.isEmpty) {
+    if (_rating == 0 && _accuracy == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please provide feedback or a rating.')),
+        const SnackBar(content: Text("Please complete the evaluation before submitting.")),
       );
       return;
     }
-
-    // Store the feedback, rating, and responses (you can send this service to a server or save locally)
-    print('Rating: $_rating');
-    print('Satisfaction: $_satisfaction');
-    print('Accuracy: $_accuracy');
-    print('Ease of Use: $_easeOfUse');
-    print('Recommend: $_recommend');
-    print('Comments: ${_commentController.text}');
-
-    // Show confirmation
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Thank you for your feedback!')),
+    // Success Dialog
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+        title: const Icon(Icons.check_circle, color: Colors.green, size: 50),
+        content: const Text(
+          "Thank you! Your feedback has been recorded for the project research evaluation.",
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // Close dialog
+              Navigator.pop(context); // Go back to previous screen
+            },
+            child: const Text("Done"),
+          )
+        ],
+      ),
     );
-
-    // Optionally clear the form
-    setState(() {
-      _rating = 0.0;
-      _satisfaction = null;
-      _accuracy = null;
-      _easeOfUse = null;
-      _recommend = null;
-      _commentController.clear();
-    });
   }
 }

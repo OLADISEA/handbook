@@ -1,410 +1,279 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:ui_chatbot/core/widgets/buttons/primary_button.dart';
 import 'package:ui_chatbot/core/widgets/texts/app_text.dart';
-import 'package:ui_chatbot/widget/reusable_text.dart';
-
-import '../../../../config/app_colors.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../../widget/my_button.dart';
-import '../../../../widget/my_textfield.dart';
+import 'package:ui_chatbot/core/constants/app_colors.dart';
+import '../../../chat/chatbot_page.dart';
 import '../bloc/auth_bloc/auth_bloc.dart';
 import '../bloc/auth_bloc/auth_event.dart';
 import '../bloc/auth_bloc/auth_state.dart';
 
 class RegisterPage extends StatefulWidget {
   final void Function()? onTap;
-
-  const RegisterPage({Key? key, this.onTap}) : super(key: key);
+  const RegisterPage({super.key, this.onTap});
 
   @override
-  _RegisterPageState createState() => _RegisterPageState();
+  RegisterPageState createState() => RegisterPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
-  // Controllers for input fields
+class RegisterPageState extends State<RegisterPage> {
+  final _formKey = GlobalKey<FormState>();
+
+  final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPassController = TextEditingController();
-  final TextEditingController nameController = TextEditingController();
+  // final TextEditingController confirmPassController = TextEditingController();
 
-  // For dropdown (Program)
-  String? selectedProgram;
-  final List<String> programs = [
-    'Computer Science',
-    'Software Engineering',
-    'Cyber Security',
-    'ICT',
-
+  String? selectedLevel;
+  final List<String> academicLevels = [
+    '100 Level',
+    '200 Level',
+    '300 Level',
+    '400 Level',
+    '500 Level',
+    'M.Sc. Student',
   ];
-
-  void register(BuildContext context) {
-    if (passwordController.text == confirmPassController.text) {
-      print(true);
-      try {
-        //auth.signInWithEmailAndPass(emailController.text, passwordController.text);
-        // Handle additional fields like name and program as needed
-      } catch (e) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text(e.toString()),
-          ),
-        );
-      }
-    } else {
-      showDialog(
-        context: context,
-        builder: (context) => const AlertDialog(
-          title: Text("Passwords don't match"),
-        ),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthBloc, AuthState>(
-      builder: (BuildContext context, AuthState state) {
-        return Scaffold(
-          backgroundColor: AppColors.white,
-          body: SingleChildScrollView(
-            child: Container(
-              margin: EdgeInsets.only(top: 150.h,left: 23.w,right: 23.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Logo
-                  Center(
-                    child: Icon(
-                      Icons.message,
-                      size: 60,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
+    const primaryColor = Color(0xFF6C63FF);
 
-                  // Welcome message
-                  Center(
-                    child: Text(
-                      "Let's create an account for you",
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary, fontSize: 16.sp),
-                    ),
-                  ),
-                  const SizedBox(height: 25,),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: BlocConsumer<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state.status == AuthStatus.authenticated) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Registration Successful!")),
+            );
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const ChatBotPage()),
+            );
+          }
+          if (state.status == AuthStatus.error) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.errorMessage ?? "Error"), backgroundColor: Colors.red),
+            );
+          }
+          // Add logic to handle registration success/failure from Bloc
+        },
+        builder: (context, state) {
+          bool isLoading = state.status == AuthStatus.loading;
+          return SafeArea(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 40.h),
 
-
-                  Padding(
-                    padding: EdgeInsets.only(left: 1.w),
-                    child: Reusable(text: "Name",fontSize: 14.sp,),
-                  ),
-                  SizedBox(height: 3.h,),
-                  AppTextField(controller: nameController, obscureText: false, hintText: "Name",),
-                  SizedBox(height: 15.h,),
-
-
-                  Padding(
-                    padding: EdgeInsets.only(left: 1.w),
-                    child: Reusable(text: "Program",fontSize: 14.sp,),
-                  ),
-                  SizedBox(height: 3.h,),
-                  SizedBox(
-                    width: double.infinity,
-                    child: DropdownButtonFormField<String>(
-                      value: selectedProgram,
-                      hint: AppText(
-                        fontSize: 14.sp,
-                          text: "Select Program",
-                          color: AppColors.black
+                    // 1. Brand Header
+                    Center(
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(16.r),
+                            decoration: BoxDecoration(
+                              color: primaryColor.withValues(alpha: 0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(Icons.school_outlined, size: 50.sp, color: primaryColor),
+                          ),
+                          SizedBox(height: 16.h),
+                          AppText(text: "Create Account", fontSize: 24.sp, fontWeight: FontWeight.bold),
+                          SizedBox(height: 8.h),
+                          AppText(
+                            text: "Join the UI Computer Science community",
+                            fontSize: 14.sp,
+                            color: Colors.grey.shade600,
+                          ),
+                        ],
                       ),
-                      items: programs.map((String program) {
-                        return DropdownMenuItem<String>(
-                          value: program,
-                          child: Text(program),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          selectedProgram = newValue!;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
+                    ),
+
+                    SizedBox(height: 32.h),
+
+                    // 2. Input Fields
+                    _buildLabel("Full Name"),
+                    _buildTextField(
+                      controller: nameController,
+                      hint: "Enter your full name",
+                      icon: Icons.person_outline,
+                      validator: (val) => val!.isEmpty ? "Please enter your name" : null,
+                    ),
+
+                    SizedBox(height: 16.h),
+                    _buildLabel("Academic Level"),
+                    _buildDropdown(primaryColor),
+
+                    SizedBox(height: 16.h),
+                    _buildLabel("University Email"),
+                    _buildTextField(
+                      controller: emailController,
+                      hint: "e.g. name@stu.ui.edu.ng",
+                      icon: Icons.email_outlined,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (val) => !val!.contains('@') ? "Enter a valid email" : null,
+                    ),
+
+                    SizedBox(height: 16.h),
+                    _buildLabel("Password"),
+                    _buildTextField(
+                      controller: passwordController,
+                      hint: "Create a strong password",
+                      icon: Icons.lock_outline,
+                      obscureText: !state.isPasswordVisible,
+                      suffix: IconButton(
+                        icon: Icon(state.isPasswordVisible ? Icons.visibility : Icons.visibility_off, size: 20.sp),
+                        onPressed: () => context.read<AuthBloc>().add(TogglePasswordVisibilityEvent()),
+                      ),
+                      validator: (val) => val!.length < 6 ? "Minimum 6 characters" : null,
+                    ),
+
+                    // SizedBox(height: 16.h),
+                    // _buildLabel("Confirm Password"),
+                    // _buildTextField(
+                    //   controller: confirmPassController,
+                    //   hint: "Repeat your password",
+                    //   icon: Icons.lock_reset,
+                    //   obscureText: !state.isPasswordVisible,
+                    //   validator: (val) => val != passwordController.text ? "Passwords do not match" : null,
+                    // ),
+
+                    SizedBox(height: 24.h),
+
+                    // 3. Agreement Text
+                    Center(
+                      child: RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          style: TextStyle(color: Colors.grey.shade600, fontSize: 11.sp, height: 1.5),
+                          children: [
+                            const TextSpan(text: "By registering, you agree to our "),
+                            TextSpan(text: "Terms of Service", style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+                            const TextSpan(text: " and "),
+                            TextSpan(text: "Privacy Policy", style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+                          ],
                         ),
                       ),
                     ),
-                  ),
 
-                  SizedBox(height: 15.h,),
+                    SizedBox(height: 32.h),
 
-                  // Email text field
-                  Padding(
-                    padding: EdgeInsets.only(left: 1.w),
-                    child: Reusable(text: "Email",fontSize: 14.sp,),
-                  ),
-                  SizedBox(height: 3.h,),
-                  AppTextField(controller: emailController, obscureText: false, hintText: "Email",),
-                  SizedBox(height: 15.h,),
-
-                  // Password text field
-                  Padding(
-                    padding: EdgeInsets.only(left: 1.w),
-                    child: Reusable(text: "Password",fontSize: 14.sp,),
-                  ),
-                  SizedBox(height: 3.h,),
-                  AppTextField(
-                    controller: passwordController,
-                    hintText: "Password",
-                    obscureText: !state.isPasswordVisible,
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        state.isPasswordVisible
-                            ? Icons.visibility
-                            : Icons.visibility_off,
-                      ),
-                      onPressed: () {
-                        context.read<AuthBloc>().add(TogglePasswordVisibilityEvent());
+                    // 4. Register Button
+                    PrimaryButton(
+                      text: isLoading ? "Creating Account..." : "Sign Up",
+                      onPressed: isLoading
+                          ? (){} // Disables button while loading
+                          : () {
+                        if (_formKey.currentState!.validate() && selectedLevel != null) {
+                          context.read<AuthBloc>().add(
+                            RegisterRequested(
+                              nameController.text.trim(),
+                              emailController.text.trim(),
+                              passwordController.text.trim(),
+                              selectedLevel!,
+                            ),
+                          );
+                        }
                       },
                     ),
-                  ),
-                  SizedBox(height: 15.h,),
 
-                  // Confirm password text field
-                  Padding(
-                    padding: EdgeInsets.only(left: 1.w),
-                    child: Reusable(text: "Confirm Password",fontSize: 14.sp,),
-                  ),
-                  SizedBox(height: 3.h,),
-                  AppTextField(controller: confirmPassController, hintText: "Confirm Password",
-                    obscureText: !state.isPasswordVisible,
-                    suffixIcon: IconButton(
-                    icon: Icon(
-                    state.isPasswordVisible
-                    ? Icons.visibility
-                        : Icons.visibility_off,
-                    ),
-                    onPressed: () {
-                      context.read<AuthBloc>().add(
-                          TogglePasswordVisibilityEvent());
-                    }
-                  ),
-                  ),
-                  SizedBox(height: 10.h,),
-                  const Reusable(text: "By continuing, you agree to the Terms of Use. Read our Privacy Policy."),
-                  SizedBox(height: 25.h,),
+                    SizedBox(height: 24.h),
 
-                  // Register button
-                  MyButton(
-                    text: "Register",
-                    textColor: Colors.white,
-                    buttonColor: AppColor.gradientColor1,
-                    fontSize: 15.sp,
-                    onTap: () => register(context),
-                  ),
-                  const SizedBox(height: 25,),
-
-                  // Already have an account text
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      AppText(
-                          text: "Already have an account? ",
-                          fontSize: 15.sp,
-                      ),
-                      GestureDetector(
-                        onTap: widget.onTap,
-                        child: AppText(
-                            text:" Log in",
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryColor
+                    // 5. Footer
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AppText(text: "Already have an account? ", fontSize: 14.sp),
+                        GestureDetector(
+                          onTap: widget.onTap,
+                          child: AppText(
+                            text: "Log In",
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.bold,
+                            color: primaryColor,
+                          ),
                         ),
-                      )
-                    ],
-                  ),
-
-                  SizedBox(height: 40.h,),
-                ],
+                      ],
+                    ),
+                    SizedBox(height: 40.h),
+                  ],
+                ),
               ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildLabel(String text) {
+    return Padding(
+      padding: EdgeInsets.only(left: 4.w, bottom: 8.h),
+      child: AppText(text: text, fontSize: 13.sp, fontWeight: FontWeight.w600, color: Colors.black87),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    bool obscureText = false,
+    Widget? suffix,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      validator: validator,
+      style: TextStyle(fontSize: 15.sp),
+      decoration: InputDecoration(
+        hintText: hint,
+        prefixIcon: Icon(icon, color: const Color(0xFF6C63FF), size: 20.sp),
+        suffixIcon: suffix,
+        filled: true,
+        fillColor: Colors.grey.shade50,
+        contentPadding: EdgeInsets.symmetric(vertical: 16.h),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: Colors.grey.shade200)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: Colors.grey.shade200)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: Color(0xFF6C63FF))),
+      ),
+    );
+  }
+
+  Widget _buildDropdown(Color primaryColor) {
+    return DropdownButtonFormField<String>(
+      dropdownColor: AppColors.white,
+      initialValue: selectedLevel,
+      validator: (val) => val == null ? "Please select a program" : null,
+      decoration: InputDecoration(
+        prefixIcon: Icon(
+            Icons.book_outlined,
+            color: primaryColor,
+            size: 20.sp),
+        filled: true,
+        fillColor: Colors.grey.shade50,
+        contentPadding: EdgeInsets.symmetric(vertical: 16.h),
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.r),
+            borderSide: BorderSide(color: Colors.grey.shade200)
+        ),
+        enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.r),
+            borderSide: BorderSide(color: Colors.grey.shade200)),
+      ),
+      hint: Text("What is your current level?", style: TextStyle(fontSize: 14.sp, color: Colors.grey.shade500)),
+      items: academicLevels.map((level) =>
+          DropdownMenuItem(
+              value: level,
+              child: Text(level)
+      )).toList(),
+      onChanged: (val) => setState(() => selectedLevel = val),
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:ui_chatbot/bloc/auth_bloc/auth_bloc.dart';
-// import 'package:ui_chatbot/bloc/auth_bloc/auth_state.dart';
-//
-// import '../../bloc/auth_bloc/auth_event.dart';
-// import '../../config/app_colors.dart';
-// import '../../services/auth/auth_services.dart';
-// import '../../widget/my_button.dart';
-// import '../../widget/my_textfield.dart';
-//
-// class RegisterPage extends StatelessWidget {
-//   final TextEditingController emailController = TextEditingController();
-//   final TextEditingController passwordController = TextEditingController();
-//   final TextEditingController confirmPassController = TextEditingController();
-//
-//
-//   final void Function()? onTap;
-//   RegisterPage({Key? key, this.onTap}) : super(key: key);
-//
-//   void register(BuildContext context){
-//     final auth = AuthService();
-//     if(passwordController.text == confirmPassController.text){
-//       try{
-//         auth.signInWithEmailAndPass(emailController.text, passwordController.text);
-//       }catch (e){
-//         showDialog(context: context, builder: (context)=>
-//             AlertDialog(
-//               title: Text(e.toString()),
-//             )
-//         );
-//       }
-//     }else{
-//       showDialog(context: context, builder: (context)=>
-//       const AlertDialog(
-//         title: Text("Password don't match"),
-//       )
-//       );
-//     }
-//
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return BlocBuilder<AuthBloc,AuthState>(
-//       builder: (BuildContext context, AuthState state) {
-//         return Scaffold(
-//           backgroundColor: Theme.of(context).colorScheme.background,
-//           body: Column(
-//             mainAxisAlignment: MainAxisAlignment.center,
-//             children: [
-//               //logo
-//               Icon(
-//                 Icons.message,
-//                 size: 60,
-//                 color: Theme.of(context).colorScheme.primary,
-//               ),
-//
-//               //welcome back message
-//               Text(
-//                 "Let's create an account for you",
-//                 style: TextStyle(
-//                     color: Theme.of(context).colorScheme.primary,
-//                     fontSize: 16
-//                 ),
-//               ),
-//               const SizedBox(height: 25,),
-//
-//               //email textfield
-//               MyTextField(controller: emailController,obscureText: false,hintText: "Email",),
-//
-//               const SizedBox(height: 10,),
-//
-//               //password textfield
-//               MyTextField(
-//                   controller: passwordController,
-//                   hintText: "Password",
-//                   obscureText: !state.isPasswordVisible,
-//                   suffixIcon: IconButton(
-//                     icon: Icon(
-//                       state.isPasswordVisible
-//                           ? Icons.visibility
-//                           : Icons.visibility_off,
-//                     ), onPressed: () {
-//                     context.read<AuthBloc>().add(TogglePasswordVisibilityEvent());
-//                   },
-//                   ),
-//
-//               ),
-//
-//               //confirm password
-//
-//               const SizedBox(height: 10,),
-//
-//
-//               MyTextField(
-//                   controller: confirmPassController,
-//                   hintText: "Confirm Password",
-//                   obscureText: true),
-//
-//
-//               const SizedBox(height: 25,),
-//
-//               //login button
-//               MyButton(
-//                 text: "Register",
-//                 textColor: Colors.white,
-//                 buttonColor: AppColor.gradientColor1,
-//                 fontSize: 15.sp,
-//                 onTap: () => register(context),
-//               ),
-//
-//               const SizedBox(height: 25,),
-//
-//               //register now text button
-//               Row(
-//                 mainAxisAlignment: MainAxisAlignment.center,
-//                 children: [
-//                   Text("Already have an account?",
-//                     style: TextStyle(
-//                         color: Theme.of(context).colorScheme.primary
-//                     ),
-//                   ),
-//                   GestureDetector(
-//                     onTap: onTap,
-//                     child: Text("Log in",
-//                       style: TextStyle(
-//                           fontWeight: FontWeight.bold,
-//                           color: Theme.of(context).colorScheme.primary
-//                       ),
-//                     ),
-//                   )
-//                 ],
-//               )
-//             ],
-//           ),
-//         );
-//       },
-//
-//     );
-//   }
-// }

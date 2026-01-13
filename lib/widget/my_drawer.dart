@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ui_chatbot/config/app_colors.dart';
+import 'package:ui_chatbot/core/constants/app_assets.dart';
+import 'package:ui_chatbot/core/constants/app_colors.dart';
+import 'package:ui_chatbot/core/widgets/texts/app_text.dart';
 import '../features/auth/presentation/view/login_page.dart';
 import '../features/feedback/feedback_page.dart';
 import '../features/settings/settings_page.dart';
@@ -21,7 +26,7 @@ class MyDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: AppColor.backgroundColor,
+      backgroundColor: AppColors.white,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -39,8 +44,11 @@ class MyDrawer extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(left: 25),
                   child: ListTile(
-                    title: Text("H O M E"),
-                    leading: Icon(Icons.home),
+                    title: AppText(text: "Home"),
+                    leading:  SvgPicture.asset(
+                      AppAssets.home,
+                      width: 25.sp,
+                    ),
                     onTap: (){
                       Navigator.pop(context);
                     },
@@ -52,9 +60,13 @@ class MyDrawer extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(left: 25),
                 child: ListTile(
-                  title: Text("HISTORY"),
+                  title: AppText(text: "History"),
                   leading: const Icon(Icons.history_outlined),
                   onTap: (){
+                    Navigator.pop(context); // close main drawer
+
+                    // open history drawer (ChatGPT-style)
+                    Scaffold.of(context).openEndDrawer();
                     //Navigator.push(context, MaterialPageRoute(builder: (context)=> const QueryHistoryPage()));
 
                   },
@@ -66,8 +78,9 @@ class MyDrawer extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(left: 25),
                 child: ListTile(
-                  title: Text("F E E D B A C K"),
-                  leading: const Icon(Icons.feedback),
+                  title: AppText(text: "Feedback"),
+                  leading:  SvgPicture.asset(AppAssets.support, width: 25.sp,),
+
                   onTap: (){
                     Navigator.push(context, MaterialPageRoute(builder: (context)=> const FeedbackScreen()));
 
@@ -80,11 +93,14 @@ class MyDrawer extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.only(left: 25),
                   child: ListTile(
-                    title: Text("S E T T I N G S"),
-                    leading:  Icon(Icons.settings),
+                    title: AppText(text: "Privacy Settings"),
+                    leading:  SvgPicture.asset(AppAssets.settings, width: 25.sp,),
+
                     onTap: (){
                       Navigator.pop(context);
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=> Settings()));
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=> SettingsPage(
+
+                      )));
                     },
                   ),
                 ),
@@ -95,8 +111,14 @@ class MyDrawer extends StatelessWidget {
           Padding(
             padding: EdgeInsets.only(left: 25,bottom: 25),
             child: ListTile(
-              title: Text("L O G O U T"),
-              leading:  Icon(Icons.logout),
+              title: const AppText(
+                text: "Sign out",
+                color: AppColors.red,
+              ),
+              leading:  SvgPicture.asset(
+                  AppAssets.signOut,
+                width: 25.sp,
+              ),
               onTap: (){
                 logOut(context);
               },

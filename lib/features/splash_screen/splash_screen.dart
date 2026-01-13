@@ -7,6 +7,7 @@ import 'package:ui_chatbot/core/widgets/texts/app_text.dart';
 
 import '../../core/constants/app_assets.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/service/root_navigation_service.dart';
 import '../../widget/reusable_text.dart';
 import '../onboarding/onboarding_screen.dart';
 
@@ -24,10 +25,25 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   void initState() {
+    _checkNavigation();
     Future.delayed(const Duration(milliseconds: 3000), () {
       Navigator.of(context).push(MaterialPageRoute(builder: (context) => const OnboardingPage()));
     });
     super.initState();
+  }
+
+  Future<void> _checkNavigation() async {
+    // Add a delay for the splash animation to show
+    await Future.delayed(const Duration(milliseconds: 3000));
+
+    // Get the correct screen
+    Widget startScreen = await RootNavigationService.getStartScreen();
+
+    if (mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => startScreen),
+      );
+    }
   }
 
   @override
@@ -83,7 +99,7 @@ class _SplashScreenState extends State<SplashScreen> {
                         child: AppText(
                           fontFamily: 'qurova',
                           textAlign: TextAlign.center,
-                          text: "HandiBot",
+                          text: "HandyBot",
                           fontSize: 30.sp,
                           fontWeight: FontWeight.w700,
                         ),
@@ -92,7 +108,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
                 ),
                 SizedBox(height: 280.h,),
-                Reusable(text: "A Platform for prospective UI students",textColor: Colors.white,fontSize: 12.sp,)
+                Reusable(text: "Your Intelligent Guide to the UI Computer Science Handbook",textColor: Colors.white,fontSize: 12.sp,)
               ],
             ),
 

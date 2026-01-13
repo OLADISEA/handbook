@@ -11,6 +11,11 @@ class AppAssets{
   static const String barbingComplete = 'assets/svg/barbing_complete.svg';
   static const String carComplete = 'assets/svg/car_complete.svg';
   static const String ticket = 'assets/svg/ticket.svg';
+  static const String home = 'assets/svg/Home.svg';
+  static const String signOut = 'assets/svg/signOut.svg';
+  static const String settings = 'assets/svg/settings.svg';
+  static const String support = 'assets/svg/support.svg';
+  static const String camera = 'assets/svg/Camera.svg';
   static const String splash = 'assets/images/splash_img.png';
 
   //nav bar
@@ -80,7 +85,6 @@ class AppAssets{
   static const String phone = 'assets/svg/phone.svg';
   static const String note = 'assets/svg/note.svg';
   static const String logOut = 'assets/svg/log_out.svg';
-  static const String support = 'assets/svg/support.svg';
   static const String transaction = 'assets/svg/transaction.svg';
   static const String transactions = 'assets/svg/transactions.svg';
   static const String legal = 'assets/svg/legal.svg';
